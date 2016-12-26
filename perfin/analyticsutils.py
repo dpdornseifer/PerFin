@@ -13,11 +13,11 @@ def getsavings(data, dt_start=None, dt_end=None, aggregation_period='M', thresh=
     return aggregated.dropna(thresh=thresh)
 
 
-def getstdev(data, dt_start, dt_end):
+def getstdev(data, dt_start=None, dt_end=None):
     """ returns a dict with the standard deviation of numeric columns over the given time period """
 
-    stdev = data[dt_start: dt_end].std()
-    return dict(stdev[stdev.notnull()])
+    stdev = data[dt_start:dt_end].std()
+    return stdev[stdev.notnull()]
 
 
 def getmovingaverage(data, dt_start, dt_end):
