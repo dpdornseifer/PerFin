@@ -15,7 +15,7 @@ class TestImportdirectory(TestCase):
 
     def test_importdirectory_files_dir(self):
         data = iu.importcsvsfromdirectory(self.path_files)
-        self.assertEqual(len(data), 6)
+        self.assertEqual(len(data), 10)
 
     def test_importdirectory_files_dir_datetime_index(self):
         from pandas import DatetimeIndex
