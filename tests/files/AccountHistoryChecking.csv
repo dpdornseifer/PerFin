@@ -1,9 +1,15 @@
 Account Number,Post Date,Check,Description,Debit,Credit,Status,Balance
-"**********",12/5/2016,,"ACH Credit VENMO  - CASHOUT  ",,1198.75,Posted,1234.23
-"**********",11/30/2016,,"Withdrawal  Transfer to *********",580.00,,Posted,1223.48
-"**********",12/5/2015,,"ACH Credit VENMO  - CASHOUT  ",,123.75,Posted,1234.23
-"**********",10/3/2015,,"ACH Credit VENMO  - CASHOUT  ",,12.37,Posted,1234.23
-"**********",12/5/2016,,"ACH Credit VENMO  - CASHOUT  ",,1198.75,Posted,1234.23
-"**********",12/16/2016,,"ACH Credit VENMO  - CASHOUT  ",,11.00,Posted,1234.23
-"**********",12/19/2016,,"ACH Credit VENMO  - CASHOUT  ",,15.00,Posted,1234.23
-"**********",12/22/2016,,"Internet ",123.12,,Posted,1234.23
+"**********",07/21/2015,,"ACH Credit VENMO  - PAYMENT  ",11919.00,,Posted,
+"**********",08/12/2015,,"Withdrawal  Transfer to *********",230.00,,Posted,
+"**********",10/03/2015,,"ACH Credit VENMO  - CASHOUT  ",,12.37,Posted,
+"**********",12/05/2015,,"ACH Credit VENMO  - CASHOUT  ",,123.75,Posted,
+"**********",04/19/2016,,"ACH Credit VENMO  - PAYMENT  ",119.00,,Posted,
+"**********",11/30/2016,,"Withdrawal  Transfer to *********",123.00,,Posted,
+"**********",12/03/2016,,"ACH Credit VENMO  - PAYMENT  ",19.00,,Posted,
+"**********",12/05/2016,,"ACH Credit VENMO  - CASHOUT  ",,1198.75,Posted,
+"**********",12/11/2016,,"ACH Credit VENMO  - PAYMENT  ",1198.75,,Posted,
+"**********",12/16/2016,,"ACH Credit VENMO  - CASHOUT  ",,11.00,Posted,
+"**********",12/19/2016,,"ACH Credit VENMO  - CASHOUT  ",,15.00,Posted,
+"**********",12/21/2016,,"Withdrawal  Transfer to *********",530.00,,Posted,
+"**********",12/22/2016,,"ACH Credit VENMO  - CASHOUT  ",,1198.75,Posted,
+"**********",12/25/2016,,"Internet ",123.12,,Posted,
