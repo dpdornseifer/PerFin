@@ -1,11 +1,15 @@
 # PerFin
 PerFin is a  Personal Finance library for Python
 
-## Features
-* Basically a wrapper library for Pandas right now
+## What is PerFin
+It's basically a wrapper library for Pandas and Zipline with the focus on an easy to use interface
+
+### Implemented so far:
 * Load and handle csv files 
-* Calculate montly savings 
-* Get the standard deviation of a given account - try to handle the noise :)
+* Calculate montly savings and outliers  
+* Get aggregates for easy analytics 
+
+### More to come 
 * Will add a simple API for backtesting, plotting in Jupyter, monte carlo simulations ... over the next month
 
 ## Examples 
@@ -18,6 +22,6 @@ To get a PerFin playground execute the following steps
  
 2. Open the interpreter in the `PerFin` folder. Load the playground script from the examples folder. 
  * Option 1: Import the playground module. The code is directly executed and is then available via `playground.data`
- * Option 2: Add the variables to the interpreters global scope e.g. `exec(open("/Users/admin/pythonprojects/perfin/examples/playground.py").read(), globals()`
+ * Option 2: Add the variables to the interpreters global scope e.g. `exec(open("/Users/admin/pythonprojects/perfin/examples/playground.py").read(), globals())`
 
 3. Have fun

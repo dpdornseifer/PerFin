@@ -3,7 +3,6 @@ from perfin import importutils as iu
 from perfin import analyticsutils as au
 
 
-
 # read the environment variable which points to the .csv files
 filepath = os.environ['PERFIN_FILES']
 print('filepath', filepath)
