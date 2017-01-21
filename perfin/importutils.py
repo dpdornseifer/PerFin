@@ -7,8 +7,8 @@ def importcsvsfromdirectory(path, index=None):
     """ Function which takes a directory path as a input and delivers back one a pandas dataframe.
 
     Args:
-        path: The path to the folder containing the csv files which should be imported.
-        index: The name of the column which should be used and parsed as the index column.
+        path (str): The path to the folder containing the csv files which should be imported.
+        index (str): The name of the column which should be used and parsed as the index column.
 
     Returns:
         A single pandas dataframe containing all the data kept in the csv files. If index column has been
@@ -26,6 +26,3 @@ def importcsvsfromdirectory(path, index=None):
             dataframe = dataframe.append(pd.read_csv(file, index_col=index, parse_dates=True))
 
     return dataframe
-
-
-

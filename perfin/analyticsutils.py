@@ -7,17 +7,17 @@ def getsavings(data, column_debit='Debit', column_credit='Credit', dt_start=None
     """ Consumes the checking account data and returns the monthly savings rate.
 
     Args:
-        data: The panadas dataframe containing at least a debit and a credit column.
-        column_debit: The column name for the debit column.
-        column_credit: The column name for the credit column.
-        dt_start: The start date (specific if given '2012-11-11' or the month '2012-11')
+        data (dataframe): The panadas dataframe containing at least a debit and a credit column.
+        column_debit (str): The column name for the debit column.
+        column_credit (str): The column name for the credit column.
+        dt_start (str): The start date (specific if given '2012-11-11' or the month '2012-11')
             from were the savings should be calculated.
-        dt_end: The end date (specific if given '2012-11-11' or the month '2012-11')
+        dt_end (str): The end date (specific if given '2012-11-11' or the month '2012-11')
             to were the savings should be calculated.
-        aggregation_period: Single string character like 'M' for month specifying, over which period the savings
+        aggregation_period (str): Single string character like 'M' for month specifying, over which period the savings
             are aggregated. A full specification can be found here:
             http://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
-        thresh: Require that many non-NA values.
+        thresh (int): Require that many non-NA values.
 
     Returns:
         A pandas data frame, with an additional 'Savings' column and the time difference between start and end
@@ -41,14 +41,14 @@ def getoutliers(data, column_debit='Debit', column_group_by=None, dt_start=None,
     """ Detect outliers in the 'Debit' column and return the events - a normal distribution is expected.
 
     Args:
-        data: The panadas dataframe containing at least a debit and a credit column.
-        column_debit: The column name for the debit column.
-        column_group_by: The column name that should be used to group the rows.
-        dt_start: The start date (specific if given '2012-11-11' or the month '2012-11')
+        data (dataframe): The panadas dataframe containing at least a debit and a credit column.
+        column_debit (str): The column name for the debit column.
+        column_group_by (str): The column name that should be used to group the rows.
+        dt_start (str): The start date (specific if given '2012-11-11' or the month '2012-11')
             from were the outliers should be calculated.
-        dt_end: The end date (specific if given '2012-11-11' or the month '2012-11')
+        dt_end (str): The end date (specific if given '2012-11-11' or the month '2012-11')
             to were the outliers should be calculated.
-        m: The maximum deviation in terms of standard deviation units.
+        m (int): The maximum deviation in terms of standard deviation units.
 
     Returns:
         A pandas dataframe containing all detected outliers market by a 'TRUE' value.
@@ -83,10 +83,10 @@ def getstdev(data, dt_start=None, dt_end=None):
     """ Returns a dict with the standard deviation of numeric columns over the given time period.
 
     Args:
-        data: The panadas dataframe containing at least a debit and a credit column.
-        dt_start: The start date (specific if given '2012-11-11' or the month '2012-11')
+        data (dataframe): The panadas dataframe containing at least a debit and a credit column.
+        dt_start (str): The start date (specific if given '2012-11-11' or the month '2012-11')
             from were the standard deviation should be calculated.
-        dt_end: The end date (specific if given '2012-11-11' or the month '2012-11')
+        dt_end (str): The end date (specific if given '2012-11-11' or the month '2012-11')
             to were the standard deviation should be calculated.
 
     Returns:
