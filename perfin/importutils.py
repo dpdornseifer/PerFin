@@ -4,7 +4,16 @@ import pandas as pd
 
 
 def importcsvsfromdirectory(path, index=None):
-    """ function which takes a directory path as a input and delivers back one a pandas dataframe """
+    """ Function which takes a directory path as a input and delivers back one a pandas dataframe.
+
+    Args:
+        path: The path to the folder containing the csv files which should be imported.
+        index: The name of the column which should be used and parsed as the index column.
+
+    Returns:
+        A single pandas dataframe containing all the data kept in the csv files. If index column has been
+        provided which can be parsed the dataframe will have a datetime index.
+    """
 
     dataframe = pd.DataFrame()
     files = glob.glob(path + '/*.csv')
