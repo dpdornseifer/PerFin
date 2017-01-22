@@ -2,8 +2,8 @@ import logging
 import pandas as pd
 
 
-def getsavings(data, column_debit='Debit', column_credit='Credit', dt_start=None, dt_end=None, aggregation_period='M',
-               thresh=1):
+def get_savings(data, column_debit='Debit', column_credit='Credit', dt_start=None, dt_end=None, aggregation_period='M',
+                thresh=1):
     """ Consumes the checking account data and returns the monthly savings rate.
 
     Args:
@@ -37,7 +37,7 @@ def getsavings(data, column_debit='Debit', column_credit='Credit', dt_start=None
     return aggregated.dropna(thresh=thresh)
 
 
-def getoutliers(data, column_debit='Debit', column_group_by=None, dt_start=None, dt_end=None, m=1):
+def get_outliers(data, column_debit='Debit', column_group_by=None, dt_start=None, dt_end=None, m=1):
     """ Detect outliers in the 'Debit' column and return the events - a normal distribution is expected.
 
     Args:
@@ -79,7 +79,7 @@ def getoutliers(data, column_debit='Debit', column_group_by=None, dt_start=None,
     return outlier[outlier['Outlier_Debit']]
 
 
-def getstdev(data, dt_start=None, dt_end=None):
+def get_stdev(data, dt_start=None, dt_end=None):
     """ Returns a dict with the standard deviation of numeric columns over the given time period.
 
     Args:

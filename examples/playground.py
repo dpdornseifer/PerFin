@@ -9,17 +9,17 @@ print('filepath', filepath)
 
 
 # import the .csv files and convert the first column to the datetimeindex
-data = iu.importcsvsfromdirectory(filepath, 1)
+data = iu.import_csvs_from_directory(filepath, 1)
 print('raw data', data)
 
 
 # calculate the savings
-savings = au.getsavings(data)
+savings = au.get_savings(data)
 print('savings', savings)
 
 
 # get the stdev of the savings
-stdev = au.getstdev(savings)
+stdev = au.get_stdev(savings)
 print('stdev', stdev)
 
 

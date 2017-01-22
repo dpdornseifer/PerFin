@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 
 
-def importcsvsfromdirectory(path, index=None):
+def import_csvs_from_directory(path, index=None):
     """ Function which takes a directory path as a input and delivers back one a pandas dataframe.
 
     Args:
