@@ -1,5 +1,5 @@
-from collections import namedtuple
-
+from collections import namedtuple as nt
+from datetime import datetime as dt
 
 class Stock:
     """ The stock object represents a specific stock symbol"""
@@ -25,9 +25,12 @@ class Stock:
             amount (int): A positive integer for a buy transaction or a negative integer for a sell transaction.
             price (float): Optional parameter. The price the stocks have been bought or sold for.
         """
-        Transaction = namedtuple('Transaction', ['date', 'amount', 'price'])
+        Transaction = nt('Transaction', ['date', 'amount', 'price'])
 
-        self.holdings.append(Transaction(date, amount, price))
+        self.holdings.append(Transaction(dt.strptime(date, '%Y-%m-%d'), amount, price))
+
+        # make sure that it is in the right order after a transaction has been added
+        self.holdings = sorted(self.holdings, key=lambda x: x.date)
 
     def get_total_amount(self):
         """ Returns the total amount of shares for the given stock.
