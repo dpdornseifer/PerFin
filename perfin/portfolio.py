@@ -1,5 +1,7 @@
 from collections import namedtuple as nt
-from datetime import datetime as dt
+import datetime as dt
+import pandas as pd
+
 
 class Stock:
     """ The stock object represents a specific stock symbol"""
@@ -9,6 +11,7 @@ class Stock:
 
         Args:
             symbol (str): The given stock symbol.
+            name (str): The full company name.
 
         Returns:
             A stock object.
@@ -23,11 +26,11 @@ class Stock:
         Args:
             date (date): Date of the transaction
             amount (int): A positive integer for a buy transaction or a negative integer for a sell transaction.
-            price (float): Optional parameter. The price the stocks have been bought or sold for.
+            price (float): The price the stocks have been bought or sold for.
         """
-        Transaction = nt('Transaction', ['date', 'amount', 'price'])
-
-        self.holdings.append(Transaction(dt.strptime(date, '%Y-%m-%d'), amount, price))
+        Transaction = nt('Transaction', ['date', 'amount', 'price', 'symbol'])
+        date = date.split('-')
+        self.holdings.append(Transaction(dt.date(int(date[0]), int(date[1]), int(date[2])), amount, price, self.symbol))
 
         # make sure that it is in the right order after a transaction has been added
         self.holdings = sorted(self.holdings, key=lambda x: x.date)
@@ -44,22 +47,136 @@ class Stock:
 class Portfolio:
     """ A portfolio represents a collection of different stocks. """
 
-    def __init__(self, stocks=None):
+    def __init__(self, stock=None, stocks=None):
         """
 
         Args:
-            stocks:
+            stock (stock): A single stock object that should be added to the portfolio at construction time.
+            stocks [stock]: A list of stock objects that should be added to the portfolio at construction time.
         """
-        self.stocks = stocks
+        # dct keeping the stock information 'symbol -> stock' for easy and fast access
+        self.stocks = {}
+        self.dataframe = None
 
-    def get_current_value(self):
-        """ Returns the current value of the portfolio. """
-        pass
+        # if stocks are passed in the constructor, add the
+        if stock:
+            self.add_stock(stock)
+        if stocks:
+            self.add_stocks(stocks)
 
-    def get_weights(self):
-        """ Returns the weight distribution of the single stocks in the portfolio. """
-        pass
+    def add_stock(self, stock):
+        """ Adds a single stock to the portfolio.
 
-    def save(self):
-        """ Save the portfolio to the harddrive. """
-        pass
+        Args:
+            stock (stock) : A single stock object which should be added to the portfolio.
+        """
+        self.add_stocks([stock])
+
+    def add_stocks(self, stocks):
+        """ Adds a list of stocks to the portfolio
+
+        Args:
+            stocks [stocks]: A list of stock objects which should be added to the portfolio.
+        """
+        for stock in stocks:
+            self.stocks[stock.symbol] = stock
+
+    def get_current_stocks(self):
+        """ Returns list of symbols in the current portfolio. """
+        return list(self.stocks.keys())
+
+
+    def _create_dataframe(self):
+        """ Converts the current stocks kept in the portfolio into a dataframe for fast processing.
+
+        Datframe:
+            date,     stock_1,    stock_2
+            1-1-2010, +100,       0
+            5-2-2012, 0,          +37
+
+        """
+        symbols = self.get_current_stocks()
+        transactions = []
+        dt_start = None
+        dt_stop = None
+
+        for symbol in symbols:
+
+            holdings = self.stocks[symbol].holdings
+
+            # add holdings to overall transaction list
+            transactions += holdings
+
+            # get the date of the first and the last transaction
+            dt_start = holdings[0].date if not dt_start or holdings[0].date < dt_start else dt_start
+            dt_stop = holdings[-1].date if not dt_stop or holdings[-1].date > dt_stop else dt_stop
+
+        # create index for all transactions
+        dt_index = pd.date_range(dt_start, dt_stop).date
+
+        self.dataframe = pd.DataFrame(columns=symbols, index=pd.DatetimeIndex(dt_index)).fillna(0)
+        self.dataframe.index.name = 'date'
+
+        # fill the dataframe with the transactions from the overall list
+        for transaction in transactions:
+            self.dataframe.loc[transaction.date][transaction.symbol] = transaction.amount
+
+    def get_dataframe(self):
+        """ Returns a reference to a dataframe containing all given transactions of all stocks.
+            If the dataframe does not exist yet, it's generated before the first access."""
+
+        if self.dataframe:
+            return self.dataframe
+        else:
+            self._create_dataframe()
+            return self.dataframe
+
+    def get_weights(self, weight_by='number', prices=None):
+        """ Returns the current weight distributions of stocks in the portfolio.
+
+        Args:
+            weight_by (str): A parameter to distinguish between number of shares: 'number' or the
+                total value of the shares of a certain stock: 'value' which is number_of_shares * share_price_today.
+            prices: Dict with a 'symbol -> price' mapping where the symbol is a string and the price an int or float,
+             for all stocks in the portfolio e.g. '{'appl': 100.32, 'sap': 80.43}'.
+
+        Returns:
+            A pandas series containing the weight distribution of the stocks in the portfolio weather by the amount
+            of shares or by value.
+
+        """
+        # get the cumulative sum over the vertical axis
+        shares_sums = self.dataframe.sum(axis=0)
+
+        # total amount of shares
+        shares_total = shares_sums.sum()
+
+        if weight_by != 'value':
+            return shares_sums / shares_total
+
+        else:
+            # convert the prices to a dataframe for easy processing
+            shares_prices = pd.DataFrame([prices.values()], columns=prices.keys())
+            shares_values = shares_sums * shares_prices
+            shares_totalvalue = shares_values.sum(axis=1)
+
+            return shares_values / shares_totalvalue.iloc[0]
+
+    def get_current_value(self, prices=None):
+        """ Returns the current total value of the single stocks as well as the overall portfolio value.
+
+        Args:
+            prices: Dict with a 'symbol -> price' mapping where the symbol is a string and the price an int or float,
+                for all stocks in the portfolio e.g. '{'appl': 100.32, 'sap': 80.43}'.
+
+        Returns:
+            A dataframe containing a column for each stock with its total value given the input price as well as a
+            'TOTAL' column with the portfolio value.
+        """
+        shares_sums = self.dataframe.sum(axis=0)
+        shares_prices = pd.DataFrame([prices.values()], columns=prices.keys())
+
+        shares_values = shares_sums * shares_prices
+        shares_values['TOTAL'] = shares_values.sum(axis=1)
+
+        return shares_values
