@@ -71,7 +71,6 @@ class TestPortfolio(TestCase):
         appl.add_transaction('2016-10-6', 30)
 
         self.portfolio = Portfolio(stocks=[ibm, appl])
-        self.portfolio.get_dataframe()
 
         weight_ibm = 0.73
         weight_appl = 0.27
@@ -93,7 +92,6 @@ class TestPortfolio(TestCase):
         appl.add_transaction('2016-10-6', 30)
 
         self.portfolio = Portfolio(stocks=[ibm, appl])
-        self.portfolio.get_dataframe()
 
         prices = {'APPL': 100.32, 'IBM': 171.03}
 
@@ -119,7 +117,6 @@ class TestPortfolio(TestCase):
         appl.add_transaction('2016-10-6', 30)
 
         self.portfolio = Portfolio(stocks=[ibm, appl])
-        self.portfolio.get_dataframe()
 
         prices = {'APPL': 100.32, 'IBM': 171.03}
 

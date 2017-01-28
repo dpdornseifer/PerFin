@@ -7,7 +7,7 @@ class Stock:
     """ The stock object represents a specific stock symbol"""
 
     def __init__(self, symbol, name=None):
-        """
+        """ #
 
         Args:
             symbol (str): The given stock symbol.
@@ -121,15 +121,19 @@ class Portfolio:
         for transaction in transactions:
             self.dataframe.loc[transaction.date][transaction.symbol] = transaction.amount
 
-    def get_dataframe(self):
-        """ Returns a reference to a dataframe containing all given transactions of all stocks.
-            If the dataframe does not exist yet, it's generated before the first access."""
 
-        if self.dataframe:
-            return self.dataframe
-        else:
+    def _get_dataframe(self):
+        """ Internal dataframe proxy access method, to make sure that every time an internal access to the dataframe
+            occurs it has been generated and is accessible. """
+        # TODO set this method up as a wrapper for all methods that need access to the dataframe
+        if not self.dataframe:
             self._create_dataframe()
-            return self.dataframe
+
+    def get_dataframe(self):
+        """ Returns a external reference to the internal dataframe containing all given transactions of all stocks.
+            If the dataframe does not exist yet, it's generated before the first access."""
+        self._get_dataframe()
+        return self.dataframe
 
     def get_weights(self, weight_by='number', prices=None):
         """ Returns the current weight distributions of stocks in the portfolio.
@@ -146,6 +150,7 @@ class Portfolio:
 
         """
         # get the cumulative sum over the vertical axis
+        self._get_dataframe()
         shares_sums = self.dataframe.sum(axis=0)
 
         # total amount of shares
@@ -173,6 +178,7 @@ class Portfolio:
             A dataframe containing a column for each stock with its total value given the input price as well as a
             'TOTAL' column with the portfolio value.
         """
+        self._get_dataframe()
         shares_sums = self.dataframe.sum(axis=0)
         shares_prices = pd.DataFrame([prices.values()], columns=prices.keys())
 
