@@ -7,7 +7,7 @@ class Stock:
     """ The stock object represents a specific stock symbol"""
 
     def __init__(self, symbol, name=None):
-        """ #
+        """ Creates a stock object which keeps a particular stock symbol, a company name and the transactions.
 
         Args:
             symbol (str): The given stock symbol.
