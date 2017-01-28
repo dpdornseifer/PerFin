@@ -2,8 +2,7 @@ import logging
 import pandas as pd
 
 
-def get_savings(data, column_debit='Debit', column_credit='Credit', dt_start=None, dt_end=None, aggregation_period='M',
-                thresh=1):
+def get_savings(data, column_debit='Debit', column_credit='Credit', dt_start=None, dt_end=None, aggregation_period='M'):
     """ Consumes the checking account data and returns the monthly savings rate.
 
     Args:
@@ -17,7 +16,6 @@ def get_savings(data, column_debit='Debit', column_credit='Credit', dt_start=Non
         aggregation_period (str): Single string character like 'M' for month specifying, over which period the savings
             are aggregated. A full specification can be found here:
             http://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases
-        thresh (int): Require that many non-NA values.
 
     Returns:
         A pandas data frame, with an additional 'Savings' column and the time difference between start and end
@@ -32,9 +30,10 @@ def get_savings(data, column_debit='Debit', column_credit='Credit', dt_start=Non
     aggregated = data[dt_start:dt_end][[column_debit, column_credit]].copy()
 
     aggregated = aggregated.groupby(pd.TimeGrouper(aggregation_period)).sum()
-    aggregated['Savings'] = aggregated[column_credit] - aggregated[column_debit]
+    aggregated = aggregated.fillna(0)
 
-    return aggregated.dropna(thresh=thresh)
+    aggregated['Savings'] = aggregated[column_credit] - aggregated[column_debit]
+    return aggregated
 
 
 def get_outliers(data, column_debit='Debit', column_group_by=None, dt_start=None, dt_end=None, m=1):
@@ -54,7 +53,6 @@ def get_outliers(data, column_debit='Debit', column_group_by=None, dt_start=None
         A pandas dataframe containing all detected outliers market by a 'TRUE' value.
 
     """
-
     # create a copy of the required columns
     columns = [column_debit] + [column_group_by] if column_group_by else [column_debit]
     outlier = data[dt_start:dt_end][columns].copy()
@@ -93,6 +91,36 @@ def get_stdev(data, dt_start=None, dt_end=None):
         A pandas dataframe containing a single standard deviation for each colum in the input dataframe.
 
     """
-
     stdev = data[dt_start:dt_end].std()
     return stdev[stdev.notnull()]
+
+
+def get_possible_investment_amount(data, savings_column='Savings', percentage=10, **kwargs):
+    """ Returns a possible sum for a weekly, monthly stock investments considering the savings rate and the standard
+        deviation.
+
+    Args:
+        data (dataframe): The dataframe which contains the savings column.
+        savings_column (str): The columns which keeps the savings
+        percentage (int): The percent wise amount of the monthly savings that can be invested into stocks or other
+        equities.
+
+    Returns:
+        The distribution of the savings, mean and the savings stdandard devation. The possible investment amount is
+        beeing calculated by taking percentage (recommended ~%10) * savings_mean.
+        e.g.
+            {possible_investment': 123.123,
+            'savings_mean': 1231.23,
+            'savings_stdev': 240.12'}
+    """
+
+    savings = get_savings(data, **kwargs)[savings_column]
+    savings_mean = savings.mean()
+    savings_stdev = savings.std()
+
+    return {
+        'possible_investment': savings_mean * (percentage / 100),
+        'savings_mean': savings_mean,
+        'savings_stdev': savings_stdev
+    }
+

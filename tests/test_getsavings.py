@@ -15,9 +15,8 @@ class TestGetsavings(TestCase):
         self.assertTrue(au.get_savings(self.data_no_datetimeindex).empty)
 
     def test_getsavings_rows(self):
-        self.assertEqual(len(au.get_savings(self.data_datetimeindex, aggregation_period='W', thresh=0)), 75)
-        self.assertEqual(len(au.get_savings(self.data_datetimeindex, thresh=0)), 18)
-        self.assertEqual(len(au.get_savings(self.data_datetimeindex)), 7)
+        self.assertEqual(len(au.get_savings(self.data_datetimeindex, aggregation_period='W')), 75)
+        self.assertEqual(len(au.get_savings(self.data_datetimeindex)), 18)
 
     def test_getsavings_aggregates(self):
         self.assertAlmostEqual(au.get_savings(self.data_datetimeindex)['2016-12']['Debit'].iloc[0], 1882.85)
