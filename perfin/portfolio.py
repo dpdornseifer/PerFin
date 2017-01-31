@@ -1,4 +1,5 @@
 from collections import namedtuple as nt
+from functools import wraps
 import datetime as dt
 import pandas as pd
 
@@ -56,6 +57,8 @@ class Portfolio:
         """
         # dct keeping the stock information 'symbol -> stock' for easy and fast access
         self.stocks = {}
+
+        # TODO use tuple / namedtuple to add update/create timestamp for dataframe
         self.dataframe = None
 
         # if stocks are passed in the constructor, add the
@@ -85,11 +88,25 @@ class Portfolio:
         """ Returns list of symbols in the current portfolio. """
         return list(self.stocks.keys())
 
+    def _requires_dataframe(func):
+        """ Decorator function for all class methods requiring the dataframe to make sure that the df has been generated.
+
+        Returns:
+            A function wrapper, that makes sure, that the dataframe is available before the method is called.
+        """
+        @wraps(func)
+        def func_wrapper(self, *args, **kwargs):
+            if self.dataframe is None:
+                self._create_dataframe()
+            return func(self, *args, **kwargs)
+        return func_wrapper
 
     def _create_dataframe(self):
         """ Converts the current stocks kept in the portfolio into a dataframe for fast processing.
+            The dataframe is not recreated automatically after a stock or a stock related transaction has been added.
+            For better performance, a recreation should just be triggered after all stock related updates are done.
 
-        Datframe:
+        Dataframe:
             date,     stock_1,    stock_2
             1-1-2010, +100,       0
             5-2-2012, 0,          +37
@@ -121,20 +138,14 @@ class Portfolio:
         for transaction in transactions:
             self.dataframe.loc[transaction.date][transaction.symbol] = transaction.amount
 
-
-    def _get_dataframe(self):
-        """ Internal dataframe proxy access method, to make sure that every time an internal access to the dataframe
-            occurs it has been generated and is accessible. """
-        # TODO set this method up as a wrapper for all methods that need access to the dataframe
-        if not self.dataframe:
-            self._create_dataframe()
-
+    @_requires_dataframe
     def get_dataframe(self):
         """ Returns a external reference to the internal dataframe containing all given transactions of all stocks.
             If the dataframe does not exist yet, it's generated before the first access."""
-        self._get_dataframe()
+        #self._get_dataframe()
         return self.dataframe
 
+    @_requires_dataframe
     def get_weights(self, weight_by='number', prices=None):
         """ Returns the current weight distributions of stocks in the portfolio.
 
@@ -150,7 +161,6 @@ class Portfolio:
 
         """
         # get the cumulative sum over the vertical axis
-        self._get_dataframe()
         shares_sums = self.dataframe.sum(axis=0)
 
         # total amount of shares
@@ -167,6 +177,7 @@ class Portfolio:
 
             return shares_values / shares_totalvalue.iloc[0]
 
+    @_requires_dataframe
     def get_current_value(self, prices=None):
         """ Returns the current total value of the single stocks as well as the overall portfolio value.
 
@@ -178,7 +189,6 @@ class Portfolio:
             A dataframe containing a column for each stock with its total value given the input price as well as a
             'TOTAL' column with the portfolio value.
         """
-        self._get_dataframe()
         shares_sums = self.dataframe.sum(axis=0)
         shares_prices = pd.DataFrame([prices.values()], columns=prices.keys())
 
