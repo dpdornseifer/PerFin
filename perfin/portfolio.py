@@ -58,8 +58,8 @@ class Portfolio:
         # dct keeping the stock information 'symbol -> stock' for easy and fast access
         self.stocks = {}
 
-        # TODO use tuple / namedtuple to add update/create timestamp for dataframe
-        self.dataframe = None
+        # TODO use tuple / namedtuple to add update/create timestamp for _dataframe
+        self._dataframe = None
 
         # if stocks are passed in the constructor, add the
         if stock:
@@ -89,21 +89,21 @@ class Portfolio:
         return list(self.stocks.keys())
 
     def _requires_dataframe(func):
-        """ Decorator function for all class methods requiring the dataframe to make sure that the df has been generated.
+        """ Decorator function for all class methods requiring the _dataframe to make sure that the df has been generated.
 
         Returns:
-            A function wrapper, that makes sure, that the dataframe is available before the method is called.
+            A function wrapper, that makes sure, that the _dataframe is available before the method is called.
         """
         @wraps(func)
         def func_wrapper(self, *args, **kwargs):
-            if self.dataframe is None:
+            if self._dataframe is None:
                 self._create_dataframe()
             return func(self, *args, **kwargs)
         return func_wrapper
 
     def _create_dataframe(self):
-        """ Converts the current stocks kept in the portfolio into a dataframe for fast processing.
-            The dataframe is not recreated automatically after a stock or a stock related transaction has been added.
+        """ Converts the current stocks kept in the portfolio into a _dataframe for fast processing.
+            The _dataframe is not recreated automatically after a stock or a stock related transaction has been added.
             For better performance, a recreation should just be triggered after all stock related updates are done.
 
         Dataframe:
@@ -131,19 +131,18 @@ class Portfolio:
         # create index for all transactions
         dt_index = pd.date_range(dt_start, dt_stop).date
 
-        self.dataframe = pd.DataFrame(columns=symbols, index=pd.DatetimeIndex(dt_index)).fillna(0)
-        self.dataframe.index.name = 'date'
+        self._dataframe = pd.DataFrame(columns=symbols, index=pd.DatetimeIndex(dt_index)).fillna(0)
+        self._dataframe.index.name = 'date'
 
-        # fill the dataframe with the transactions from the overall list
+        # fill the _dataframe with the transactions from the overall list
         for transaction in transactions:
-            self.dataframe.loc[transaction.date][transaction.symbol] = transaction.amount
+            self._dataframe.loc[transaction.date][transaction.symbol] = transaction.amount
 
     @_requires_dataframe
     def get_dataframe(self):
-        """ Returns a external reference to the internal dataframe containing all given transactions of all stocks.
-            If the dataframe does not exist yet, it's generated before the first access."""
-        #self._get_dataframe()
-        return self.dataframe
+        """ Returns a copy of the internal _dataframe containing all given transactions of all stocks.
+            If the _dataframe does not exist yet, it's generated before the first access."""
+        return self._dataframe.copy()
 
     @_requires_dataframe
     def get_weights(self, weight_by='number', prices=None):
@@ -161,7 +160,7 @@ class Portfolio:
 
         """
         # get the cumulative sum over the vertical axis
-        shares_sums = self.dataframe.sum(axis=0)
+        shares_sums = self._dataframe.sum(axis=0)
 
         # total amount of shares
         shares_total = shares_sums.sum()
@@ -170,7 +169,7 @@ class Portfolio:
             return shares_sums / shares_total
 
         else:
-            # convert the prices to a dataframe for easy processing
+            # convert the prices to a _dataframe for easy processing
             shares_prices = pd.DataFrame([prices.values()], columns=prices.keys())
             shares_values = shares_sums * shares_prices
             shares_totalvalue = shares_values.sum(axis=1)
@@ -186,10 +185,10 @@ class Portfolio:
                 for all stocks in the portfolio e.g. '{'appl': 100.32, 'sap': 80.43}'.
 
         Returns:
-            A dataframe containing a column for each stock with its total value given the input price as well as a
+            A _dataframe containing a column for each stock with its total value given the input price as well as a
             'TOTAL' column with the portfolio value.
         """
-        shares_sums = self.dataframe.sum(axis=0)
+        shares_sums = self._dataframe.sum(axis=0)
         shares_prices = pd.DataFrame([prices.values()], columns=prices.keys())
 
         shares_values = shares_sums * shares_prices
