@@ -1,5 +1,6 @@
 from collections import namedtuple as nt
 from functools import wraps
+from perfin import portfolioutils as pu
 import datetime as dt
 import pandas as pd
 
@@ -195,3 +196,44 @@ class Portfolio:
         shares_values['TOTAL'] = shares_values.sum(axis=1)
 
         return shares_values
+
+    @_requires_dataframe
+    def get_prices(self, date=None, range='today'):
+        """ Returns the market prices for the current porfolio in the given total timespan.
+
+        Args:
+            date (datetime): The datetime object which will be evaluated when range == 'date'.
+
+            range (str):
+                'today': Take today's date as end date and today - 1 day as start date.
+                'date': Use the datetime object given in the date parameter as end date and end - 1 day as start date.
+                'range': Use the specific date range given in all stock transactions, the earliest as start and the
+                     latest as end date.
+                'full': Use the earliest transaction date as a start date and today as end date.
+
+        Returns:
+            A pandas panel containing the market prices for the given stocks in the given timespan.
+
+        """
+        symbols = self.get_current_stocks()
+
+        if range == 'today':
+            dt_end = dt.date.today()
+            dt_start = dt_end - dt.timedelta(days=1)
+
+        elif range == 'date':
+            assert isinstance(date, dt.date)
+            dt_end = date
+            dt_start = dt_end - dt.timedelta(days=1)
+
+        elif range == 'range':
+            index = self._dataframe.index
+            dt_end = index[-1].date()
+            dt_start = index[0].date()
+
+        else:
+            index = self._dataframe.index
+            dt_end = dt.date.today()
+            dt_start = index[0].date()
+
+        return pu.get_prices(symbols=symbols, dt_start=dt_start, dt_end=dt_end)
