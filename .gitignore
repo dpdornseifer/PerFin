@@ -42,3 +42,6 @@ wheels/
 *.manifest
 MANIFEST
 *.spec
+
+#macOS
+.DS_Store

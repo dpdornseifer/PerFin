@@ -1,7 +1,8 @@
 from unittest import TestCase
 import datetime as dt
 from pandas_datareader._utils import RemoteDataError
-from perfin.portfolioutils import get_prices
+from perfin.datautils import get_prices
+
 
 class TestGet_prices(TestCase):
 

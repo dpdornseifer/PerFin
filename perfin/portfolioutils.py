@@ -1,34 +1,8 @@
 """ Contains utils to work with portfolios. These utils are also directly attached to the portfolio class. """
-import logging
-import numpy as np
 import cvxopt as opt
+import numpy as np
 from cvxopt import blas, solvers
-from pandas_datareader._utils import RemoteDataError
-from zipline.utils.factory import load_bars_from_yahoo
 
-
-def get_prices(symbols, dt_start, dt_end):
-    """ Returns the 'adjusted' prices for the given timespan and the given symbols.
-
-    Args:
-        symbols [str]: The list of symbols
-        dt_start (datetime): The data for the first t
-        dt_end (datetime):
-
-    Returns:
-        Returns a pandas dataframe with the closing prices for the given symbols in the given timespan.
-
-    """
-    try:
-        prices = load_bars_from_yahoo(stocks=symbols, start=dt_start, end=dt_end)
-
-    except RemoteDataError as e:
-        msg = "An error occurred reading the prices for the given symbols." \
-              "Please make sure that the stock symbols are valid: {}".format(e)
-        logging.getLogger().warning(msg)
-        raise RemoteDataError(msg)
-
-    return prices
 
 def get_returns(prices):
     """ Returns the returns for the given stocks over the given timespan.
