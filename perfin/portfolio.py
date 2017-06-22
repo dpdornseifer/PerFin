@@ -1,8 +1,28 @@
-from collections import namedtuple as nt
 from functools import wraps
-from perfin import portfolioutils as pu
+import perfin.datautils
 import datetime as dt
 import pandas as pd
+import pickle
+
+class Transaction:
+    """ The transaction object represents the details of a buy or sell transaction """
+
+    def __init__(self, date, amount, price, symbol):
+        # TODO fix
+        """ Creates a transaction object that keeps the details like the amount and date of a buy or sell transaction 
+        
+        Args:
+            date (date):
+            amount (int):
+            price (int):
+            symbol (string):
+            
+        
+        """
+        self.date = date
+        self.amount = amount
+        self.price = price
+        self.symbol = symbol
 
 
 class Stock:
@@ -30,8 +50,9 @@ class Stock:
             amount (int): A positive integer for a buy transaction or a negative integer for a sell transaction.
             price (float): The price the stocks have been bought or sold for.
         """
-        Transaction = nt('Transaction', ['date', 'amount', 'price', 'symbol'])
+
         date = date.split('-')
+
         self.holdings.append(Transaction(dt.date(int(date[0]), int(date[1]), int(date[2])), amount, price, self.symbol))
 
         # make sure that it is in the right order after a transaction has been added
@@ -49,12 +70,13 @@ class Stock:
 class Portfolio:
     """ A portfolio represents a collection of different stocks. """
 
-    def __init__(self, stock=None, stocks=None):
+    def __init__(self, stock=None, stocks=None, name=None):
         """
 
         Args:
             stock (stock): A single stock object that should be added to the portfolio at construction time.
             stocks [stock]: A list of stock objects that should be added to the portfolio at construction time.
+            name (string): A name for the portfolio object.
         """
         # dct keeping the stock information 'symbol -> stock' for easy and fast access
         self.stocks = {}
@@ -67,6 +89,8 @@ class Portfolio:
             self.add_stock(stock)
         if stocks:
             self.add_stocks(stocks)
+
+        self.name = name
 
     def add_stock(self, stock):
         """ Adds a single stock to the portfolio.
@@ -88,6 +112,24 @@ class Portfolio:
     def get_current_stocks(self):
         """ Returns list of symbols in the current portfolio. """
         return list(self.stocks.keys())
+
+    def save_to_file(self, path, name=None):
+        """ Saves the stocks contained in the portfolio as a file on harddrive. 
+        
+        Args:
+            path (string): The path to the file where the portfolio should be saved.
+        """
+        with open(path, 'wb') as f:
+            pickle.dump((self.stocks, self._dataframe), f)
+
+    def load_from_file(self, path):
+        """ Loads stocks from a saved portfolio. 
+        
+        Args:
+            path (string): The path to the saved portfolio. 
+        """
+        with open(path, 'rb') as f:
+            self.stocks, self._dataframe = pickle.load(f)
 
     def _requires_dataframe(func):
         """ Decorator function for all class methods requiring the _dataframe to make sure that the df has been generated.
@@ -236,4 +278,4 @@ class Portfolio:
             dt_end = dt.date.today()
             dt_start = index[0].date()
 
-        return pu.get_prices(symbols=symbols, dt_start=dt_start, dt_end=dt_end)
+        return perfin.datautils.get_prices(symbols=symbols, dt_start=dt_start, dt_end=dt_end)

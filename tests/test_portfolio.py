@@ -1,10 +1,15 @@
+import os
 import datetime as dt
 from perfin import portfolioutils
+from perfin import datautils
 from perfin.portfolio import Stock
 from perfin.portfolio import Portfolio
 from unittest import TestCase, mock
 from unittest.mock import ANY
 
+PATH_TMP = '/tmp'
+PATH_FILE = 'my.portfolio'
+PATH_TEST_FILES = os.getcwd() + '/files'
 
 
 class TestPortfolio(TestCase):
@@ -12,6 +17,9 @@ class TestPortfolio(TestCase):
     def setUp(self):
         self.stocks = [Stock('IBM'), Stock('AAPL')]
         self.portfolio = Portfolio()
+        self.path_tmp = PATH_TMP
+        self.path_file = PATH_FILE
+        self.path_test_files = PATH_TEST_FILES
 
     def test_new_portfolio_single_stock(self):
         self.portfolio = Portfolio(stock=self.stocks[0])
@@ -62,6 +70,41 @@ class TestPortfolio(TestCase):
         # total shares
         shares_total = shares_sum.sum()
         self.assertEqual(shares_total, 205)
+
+    def test_save_portfolio_to_file(self):
+        ibm = Stock('IBM')
+        ibm.add_transaction('2014-10-12', 100)
+        ibm.add_transaction('2015-10-12', 150)
+        ibm.add_transaction('2016-10-12', -100)
+
+        aapl = Stock('AAPL')
+        aapl.add_transaction('2014-10-6', 10)
+        aapl.add_transaction('2015-10-6', 15)
+        aapl.add_transaction('2016-10-6', 30)
+
+        self.portfolio = Portfolio(stocks=[ibm, aapl])
+        _ = self.portfolio.get_dataframe()
+
+        self.portfolio.save_to_file('/'.join([self.path_tmp, self.path_file]))
+
+    def test_load_portfolio_from_file(self):
+        self.portfolio.load_from_file('/'.join([self.path_tmp, self.path_file]))
+        df = self.portfolio.get_dataframe()
+
+        # sum - vertical
+        shares_sum = df.sum(axis=0)
+        self.assertEqual(shares_sum['IBM'], 150)
+        self.assertEqual(shares_sum['AAPL'], 55)
+
+
+    def test_load_example_portfolio_from_file(self):
+        self.portfolio.load_from_file('/'.join([self.path_test_files, self.path_file]))
+        df = self.portfolio.get_dataframe()
+
+        # sum - vertical
+        shares_sum = df.sum(axis=0)
+        self.assertEqual(shares_sum['IBM'], 150)
+        self.assertEqual(shares_sum['AAPL'], 55)
 
     def test_get_weights_number(self):
         ibm = Stock('IBM')
@@ -157,7 +200,7 @@ class TestPortfolio(TestCase):
         self.portfolio.get_prices()
         mock_get_prices.assert_called_with(symbols=symbols, dt_start=dt_start, dt_end=dt_end)
 
-    @mock.patch.object(portfolioutils, 'get_prices', autospec=True)
+    @mock.patch.object(datautils, 'get_prices', autospec=True)
     def test_get_prices(self, mock_get_prices):
         ibm = Stock('IBM')
         ibm.add_transaction('2014-10-12', 100)
